@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mondrian</title>
+  <style>
+    .background {
+      min-height: 500px;
+      background: #000;
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: repeat(12, 1fr);
+      grid-gap: 10px;
+      padding: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root" class="background"></div>
+  <script>
+    const map = Array.from({ length: 12 }, () => -1);
+    const colors = ["#F00", "#FF0", "#00F", "#FFF"];
+    const container = document.getElementById("root");
+
+    function randomIntegerNumber(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function freeSpacesFrom(rowStart, colStart) {
+      let index;
+      for (index = colStart; index < map.length && map[index] < rowStart; index++) {}
+      return index - colStart;
+    }
+
+    function fillMap(rowEnd, columnStart, columnEnd) {
+      for (let i = columnStart; i < columnEnd; i++) {
+        map[i] = rowEnd;
+      }
+    }
+
+    function addSquares() {
+      for(let rowStart = 0; rowStart < 12; rowStart++) {
+        for(let columnStart = 0; columnStart < 12; columnStart++) {
+          if(map[columnStart] && map[columnStart] > rowStart) {
+            continue;
+          }
+          const square = document.createElement("div");
+          const columnEnd = columnStart + randomIntegerNumber(1, freeSpacesFrom(rowStart + 1, columnStart));
+          const rowEnd = randomIntegerNumber(rowStart, 12);
+          square.style.background = colors[randomIntegerNumber(0, 3)];
+          square.style.gridArea = `${rowStart + 1} / ${columnStart + 1} / ${rowEnd + 1} / ${columnEnd + 1}`;
+          container.appendChild(square);
+          fillMap(rowEnd, columnStart, columnEnd);
+          columnStart = columnEnd - 1;
+        }
+      }
+    }
+
+    requestAnimationFrame(addSquares);
+  </script>
+</body>
+
+</html>
